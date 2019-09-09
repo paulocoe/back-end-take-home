@@ -1,0 +1,10 @@
+FROM postgres
+COPY 1-Airports.sql /docker-entrypoint-initdb.d/
+COPY 2-Airlines.sql /docker-entrypoint-initdb.d/
+COPY 3-Routes.sql /docker-entrypoint-initdb.d/
+COPY 4-Import.sh /docker-entrypoint-initdb.d/
+COPY airports.csv data/
+COPY airlines.csv data/
+COPY routes.csv data/
+
+RUN chmod +x /docker-entrypoint-initdb.d/*
