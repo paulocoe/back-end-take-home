@@ -25,35 +25,27 @@ namespace TakeHome.Mediator.Handlers
 
         public async Task<GetShortestRouteResponse> Handle(GetShortestRouteRequest request, CancellationToken cancellationToken)
         {
-            try
-            {
-                ValidationResult result = await ValidateRequest(request);
+            ValidationResult result = await ValidateRequest(request);
 
-                if (!result.IsValid)
-                    return CreateInvalidResponse(result.Errors[0].ErrorMessage);
+            if (!result.IsValid)
+                return CreateInvalidResponse(result.Errors[0].ErrorMessage);
 
-                request.Origin = request.Origin.ToUpper();
-                request.Destination = request.Destination.ToUpper();
+            request.Origin = request.Origin.ToUpper();
+            request.Destination = request.Destination.ToUpper();
 
-                var airports = await _service.GetAiports(request.Origin, request.Destination);
+            var airports = await _service.GetAiports(request.Origin, request.Destination);
 
-                var validationMessage = ValidateAirports(airports, request.Origin);
+            var validationMessage = ValidateAirports(airports, request.Origin);
 
-                if (!string.IsNullOrEmpty(validationMessage))
-                    return CreateInvalidResponse(validationMessage);
-                                
-                var response = await GetShortestRoute(airports, request.Origin, request.Destination);
+            if (!string.IsNullOrEmpty(validationMessage))
+                return CreateInvalidResponse(validationMessage);
 
-                if (response == "No Route")
-                    return new GetShortestRouteResponse(true, true, response);
+            var response = await GetShortestRoute(airports, request.Origin, request.Destination);
 
-                return new GetShortestRouteResponse(true, false, response);
-            }
-            catch (Exception)
-            {
-                //TODO: log here
-                return new GetShortestRouteResponse("Something wrong happened, please try again in a few minutes.");
-            }
+            if (response == "No Route")
+                return new GetShortestRouteResponse(true, true, response);
+
+            return new GetShortestRouteResponse(true, false, response);
         }
         public string ValidateAirports(List<Airport> airports, string origin)
         {
@@ -81,7 +73,7 @@ namespace TakeHome.Mediator.Handlers
 
         private async Task<string> GetShortestRoute(List<Airport> airports, string originIata3, string destinationIata3)
         {
-            Airport origin; 
+            Airport origin;
             Airport destination;
             int originIndex = -1;
             int destinationIndex = -1;
@@ -99,7 +91,7 @@ namespace TakeHome.Mediator.Handlers
 
             origin = airports[originIndex];
             destination = airports[destinationIndex];
-            
+
             return await _service.GetShortestRoute(origin, destination);
         }
     }

@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 using TakeHome.Data;
 using TakeHome.Mediator.Handlers;
 using TakeHome.Services;
@@ -35,6 +37,16 @@ namespace TakeHome
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseExceptionHandler(builder =>
+            {
+                builder.Run(async context =>
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                    context.Response.ContentType = "application/json";
+                    await context.Response.WriteAsync("Something wrong happened, please try again in a few minutes.");
+                });
+            });
 
             app.UseMvc();            
         }
